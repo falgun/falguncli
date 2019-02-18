@@ -1,0 +1,130 @@
+<?php
+namespace App\Controllers;
+
+use Falgun\Http\Auth\Auth;
+use Falgun\Http\Request\Request;
+use Falgun\Validation\Validator;
+use Falgun\Pagination\Pagination;
+use App\Models\##ModelName##Model;
+use Falgun\Controller\AbstractController;
+use Falgun\Http\Notification\Notification;
+
+final class ##ControllerName##Controller extends AbstractController
+{
+    /**
+     *  @var ##ModelName##Model
+     */
+    protected $model;
+    
+    /**
+     *  @var Auth
+     */
+     protected $auth;
+    
+    public function __construct(##ModelName##Model $model, Auth $auth)
+    {
+        $this->model = $model;
+        $this->auth = $auth;
+    }
+
+    public function showList(Request $request)
+    {
+        $pagination = new Pagination();
+        $offset = $pagination->getOffset();
+        $limit = $pagination->getLimit();
+        $order = $request->getOrder($this->model, 'id');
+        $sort = $request->getSort('DESC');
+
+        if (!empty($_GET)) {
+            foreach ($request->getUrlData() as $key => $param) {
+                if ($param === '' || $param === 'all') {
+                    continue;
+                }
+                    
+                if ($key === 'q' && !empty($param)) {
+                    $query = '%' . $param . '%';
+                    
+                    $this->model->groupCondition($this->model->condition(),
+                        function(##ModelName##Model $model) use ($query) {
+                            $model->justWhere('title', 'LIKE', $query);
+                            //$model->orWhere('details', 'LIKE', $query);
+                            //$model->orWhere('status', 'LIKE', $query);
+                        });
+                    
+                } else {
+                    if ($this->model->isColumn($key)) {
+                        $this->model->whereCond($key, $param);
+                    }
+                }
+            }
+        }
+
+        $##Modules## = $this->model->paginate($pagination)->orderBy($order, $sort)->limit($offset, $limit)->getAll();
+
+
+        return $this->loadView('list', TEMPLATE_ADMIN)->pagination($pagination)->with(compact('##Modules##'));
+    }
+
+    public function create(Request $request)
+    {
+        if(!empty($request->getParams('id'))){
+            $edit = true;
+            $##Module## = $this->model->findByID($request->getParams('id'));
+
+        }else{
+            $edit = false;
+            $##Module## = null;
+        }
+
+        if($request->isPost()){
+            $postData = (object) $request->getPostData();
+
+            $notifier = new Notification();
+            $validator = new Validator($request->getPostData(), $notifier);
+            ##ValidatorFieldPlaceholder##
+
+            if($validator->validate()){
+                ##ModelFieldPlaceholder##
+
+                if(empty($edit)){
+                    $##Module##ID = $this->model->insert();
+                }else{
+                    $this->model->where('id', $##Module##->id)->update();
+                    $##Module##ID = $##Module##->id;
+                }
+
+                $notifier->successNote('An ##Module## Has been updated successfully');
+                redirect(PANEL . '/##Module##/edit/' . $##Module##ID);
+            }
+            $##Module## = $postData;
+            return $this->loadView('form', TEMPLATE_ADMIN)->with(compact('##Module##', 'edit'));
+        }
+        
+        return $this->loadView('form', TEMPLATE_ADMIN)->with(compact('##Module##', 'edit'));
+    }
+
+    public function edit(Request $request)
+    {
+        return $this->create($request);
+    }
+
+    public function delete(Request $request)
+    {
+        if (($##Module## = $this->model->findByID($request->getParams('id'))) === false) {
+            redirect('');
+        }
+
+        if($request->isPost()){
+            $notifier = new Notification();
+            
+            if ($request->getPostData('confirm') === 'delete') {
+                $this->model->where('id', $##Module##->id)->delete();
+
+                $notifier->successNote('An ##Module## has been deleted !');
+            }
+            redirect('##Modules##');
+        }
+        
+        return $this->loadView('delete', TEMPLATE_ADMIN)->with(compact('##Module##'));
+    }
+}

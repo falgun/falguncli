@@ -1,0 +1,19 @@
+{
+    "name": "falgun/falguncli",
+    "type": "library,",
+    "authors": [
+        {
+            "name": "Ataur Rahman",
+            "email": "dev.ataur.rahman@gmail.com"
+        }
+    ],
+    "require": {
+        "mmucklo/inflect": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Falgun\\FalgunCLI\\": "src/"
+        }
+    },
+    "bin": ["bin/falguncli"]
+}

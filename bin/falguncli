@@ -1,0 +1,42 @@
+#!/usr/bin/env php
+<?php
+// Let's Boot commandline
+
+$startTime = microtime(true);
+$startMemory = round(memory_get_usage(false) / 1024 / 1024, 2);
+
+define('ROOT_DIR', dirname(dirname(dirname(dirname(__DIR__)))));
+define('DS', DIRECTORY_SEPARATOR);
+define("NS", '\\');
+
+require ROOT_DIR . DS . 'vendor' . DS . 'autoload.php';
+
+define('APP_DIR', ROOT_DIR . DS . 'src');
+define('PUBLIC_DIR', 'public');
+define('CONFIG_DIR', ROOT_DIR . DS . 'config');
+define('VAR_DIR', ROOT_DIR . DS . 'var');
+
+// Development is always true on CLI
+define('DEVELOPMENT', true);
+
+use Falgun\Console\Console;
+use Falgun\DInjector\Singleton;
+use Falgun\Reporter\DevReporter;
+use Falgun\FancyError\CliErrorHandler;
+use Falgun\FalgunCLI\CommandCollection;
+
+/**
+ * Lets prepare everything for developer reporting
+ * Report will be generated on script destruction
+ */
+$reporter = new DevReporter($startTime, $startMemory);
+Singleton::set($reporter);
+
+new CliErrorHandler();
+
+$console = new Console();
+$console->setCommandCollection(new CommandCollection());
+$status = $console->execute();
+
+
+exit($status);

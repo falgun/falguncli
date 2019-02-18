@@ -46,20 +46,20 @@ class Controller extends AbstractCommand
 <?php
 namespace App\\Controllers;
 
-use App\\Models\\' . $this->moduleName . 'Model;
+use App\\Models\\{$this->moduleName}Model;
 use Falgun\\Controller\\AbstractController;
 
-class ' . $this->controllerName . ' extends AbstractController
+class {$this->controllerName} extends AbstractController
 {
 
     /**
-     *  @var ' . $this->moduleName . 'Model
+     *  @var {$this->moduleName}Model
      */
-    protected $model;
+    protected \$model;
 
-    public function __construct(' . $this->moduleName . 'Model $model)
+    public function __construct({$this->moduleName}Model \$model)
     {
-        $this->model = $model;
+        \$this->model = \$model;
     }
 }
 PHP;

@@ -70,7 +70,7 @@ class Crud extends AbstractCommand
 
 
         $replaceArray = array(
-            '##ControllerName##' => ucfirst(Inflect::singularize($this->getControllerFileName())),
+            '##ControllerName##' => ucfirst($this->getControllerFileName()),
             '##ModelName##' => ucfirst($module),
             '##Module##' => $module,
             '##Modules##' => $modules,
@@ -92,7 +92,7 @@ class Crud extends AbstractCommand
 
     public function getControllerFileName()
     {
-        return lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', ($this->arguments['-name'] ?? $this->arguments['table']))))) . 'Manage';
+        return lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', ($this->arguments['-name'] ?? Inflect::singularize($this->arguments['table'])))))) . 'Manage';
     }
 
     public function createViews()
